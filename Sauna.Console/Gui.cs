@@ -42,10 +42,10 @@ namespace Sauna.Console
 
             // Creates a menubar, the item "New" has a help menu.
             var menu = new MenuBar(new MenuBarItem[] {
-            new MenuBarItem ("_File", new MenuItem [] {
-                new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
-            }),
-        });
+                new MenuBarItem ("_File", new MenuItem [] {
+                    new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
+                }),
+            });
             top.Add(menu);
 
             var temperatureInternalLabel = new Label("T in: ".PadRight(ColumnLabelWidth)) { X = ColumnLabelStartPosition, Y = 2 };
@@ -57,19 +57,29 @@ namespace Sauna.Console
             var etaLabel = new Label("ETA: ".PadRight(ColumnLabelWidth)) { X = ColumnLabelStartPosition, Y = 9 };
             _etaValue = new Label("") { X = Pos.Right(etaLabel), Y = Pos.Top(etaLabel), Width = ColumnValuesWidth };
 
-             _progressBar = new ProgressBar(){ X = ColumnLabelStartPosition, Y=10, Width = win.Width- ColumnLabelStartPosition };
+            _progressBar = new ProgressBar() { X = ColumnLabelStartPosition, Y = 10, Width = win.Width - ColumnLabelStartPosition };
 
-            var desiredTemperatureLabel = new Label("Desired temperature: ") {X=ColumnLabelStartPosition,Y= 7 };
-            _desiredTemperatureValue = new TextField("70") { X = Pos.Right(desiredTemperatureLabel), Y = Pos.Top(desiredTemperatureLabel), Width=3};
+            var desiredTemperatureLabel = new Label("Desired temperature: ") { X = ColumnLabelStartPosition, Y = 7 };
+            _desiredTemperatureValue = new TextField("70") { X = Pos.Right(desiredTemperatureLabel), Y = Pos.Top(desiredTemperatureLabel), Width = 3 };
 
-            _startButton = new Button("Start",true) { X = ColumnLabelStartPosition,
-                Y = 24,Clicked = StartButtonClicked };
+            win.Add(
+                desiredTemperatureLabel,
+                _desiredTemperatureValue,
+                new Button(3, 3, " + "),
+                new Button(3, 3, " - ")
+            );
+
+            _startButton = new Button("Start", true)
+            {
+                X = ColumnLabelStartPosition,
+                Y = 24,
+                Clicked = StartButtonClicked
+            };
 
             win.Add(
                 temperatureInternalLabel, _temperatureInternalValue,
                 temperatureExternalLabel, _temperatureExternalValue,
-                etaLabel, _etaValue,_progressBar,
-                desiredTemperatureLabel, _desiredTemperatureValue,
+                etaLabel, _etaValue, _progressBar,
                 _startButton
             );
         }
@@ -85,7 +95,7 @@ namespace Sauna.Console
 
         internal void StartButtonClicked()
         {
-            _isStarted= Started?.Invoke()??false;
+            _isStarted = Started?.Invoke() ?? false;
 
             _startButton.Text = _isStarted ? "Stop" : "Start";
         }

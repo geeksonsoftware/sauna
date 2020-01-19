@@ -1,6 +1,17 @@
 # sauna
 Sauna automation
 
+# Protocol
+
+Action methods: Start / Stop
+On new data method: NewData
+Parameters for new data:
+* type: (internal / external)
+* temperature: (float string)
+* humidity" (float string)
+
+
+
 # Temperature AM2302 
 
 https://learn.adafruit.com/dht

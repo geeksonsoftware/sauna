@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms" 
+    xmlns:local="clr-namespace:Sauna.UI;assembly=Sauna.UI"
+    mc:Ignorable="d" x:Class="Sauna.UI.MainPage">
+    <ContentPage.BindingContext>
+        <local:MainPageViewModel/>
+    </ContentPage.BindingContext>
+    <StackLayout Margin="20">
+        <Label Text="Target temperature:" HorizontalOptions="StartAndExpand" VerticalOptions="Start" />
+        <Slider Maximum="100" Minimum="60" Value="{Binding TargetTemperature}" VerticalOptions="Start"/>
+        <Label Text="{Binding TargetTemperature}" HorizontalOptions="CenterAndExpand" VerticalOptions="Start" />
+        <Label Text="{Binding CurrentStatus}" HorizontalOptions="CenterAndExpand" VerticalOptions="Start" />
+        <!--<microcharts:ChartView HeightRequest="360" Chart="{Binding HeatingChart}"/>-->
+        <Button Text="Start" Command="{Binding StartCommand}" HorizontalOptions="EndAndExpand"/>
+    </StackLayout>
+</ContentPage>
