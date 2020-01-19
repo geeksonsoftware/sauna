@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Sauna.RPI
 {
@@ -6,27 +7,11 @@ namespace Sauna.RPI
     {
         static void Main(string[] args)
         {
-            try
-            {
-                var runner = new Runner();
+            var sauna = new SaunaController();
+            sauna.Init();
 
-                runner.TemperatureRead += OnTemperatureRead;
-
-                runner.Start();
-
-                Console.WriteLine($"Started {DateTime.Now.ToShortTimeString()}");
-
-                Console.ReadLine();
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            Console.ReadLine();
         }
 
-        private static void OnTemperatureRead(double internalTemperature, double externalTemperature)
-        {
-            Console.WriteLine($"{DateTime.Now.ToLongTimeString()} -> internal: {internalTemperature} C, external {externalTemperature} C");
-        }
     }
 }

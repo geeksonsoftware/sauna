@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iot.Units;
+using System;
 using System.Threading.Tasks;
 
 namespace Sauna.RPI
@@ -7,7 +8,7 @@ namespace Sauna.RPI
     {
         ITemperatureReader _temperatureReader;
 
-        public event Action<double, double> TemperatureRead;
+        public event Action<DateTime, Temperature, Temperature> TemperatureRead;
 
         public Runner()
         {
@@ -20,6 +21,8 @@ namespace Sauna.RPI
 
         internal void Start()
         {
+            Console.WriteLine("Start monitoring the sauna");
+
             Task.Run(async () =>
             {
                 while (true)
@@ -31,7 +34,7 @@ namespace Sauna.RPI
 
                         if (internalTemperature.HasValue && externalTemperature.HasValue)
                         {
-                            TemperatureRead?.Invoke(internalTemperature.Value.Celsius, externalTemperature.Value.Celsius);
+                            TemperatureRead?.Invoke(DateTime.Now, internalTemperature.Value, externalTemperature.Value);
                         }
 
                         await Task.Delay(TimeSpan.FromSeconds(10));

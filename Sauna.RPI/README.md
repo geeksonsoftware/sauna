@@ -1,1 +1,0 @@
-﻿dotnet.exe publish -c RPI -r linux-arm ; rsync -avz --progress ./bin/RPI/netcoreapp3.1/linux-arm/publish/&* pi@192.168.1.115:/home/pi/Desktop/sauna_rpi
