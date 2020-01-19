@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microcharts;
+using Sauna.UI.Services;
 using SkiaSharp;
 using Xamarin.Forms;
 
@@ -45,10 +46,12 @@ namespace Sauna.UI
         }
 
         public ICommand StartCommand { private set; get; }
-        public bool IsExecuting { get; private set; }
+        public ICommand StopCommand { private set; get; }
+        public bool IsHeating { get; private set; }
         
         public Chart HeatingChart { get; private set; }
 
+        private SaunaService _saunaService;
 
         public MainPageViewModel()
         {
@@ -59,31 +62,66 @@ namespace Sauna.UI
                 MaxValue = 100.0F,
                 Margin = 10,
             };
+
+            _saunaService = new SaunaService();
+
             HeatingChart.IsAnimated = false;
             StartCommand = new Command(
                 execute: async () =>
                 {
-                    IsExecuting = true;
-                    // do shit
-                    CurrentStatus = "Heating";
-                    foreach (int index in Enumerable.Range(1, 10))
+                    try
                     {
-                        var newValue = new Random().Next(100);
-                        var newEntry = new ChartEntry(newValue);// { Label="WTF", ValueLabel = newValue.ToString() };
-                        (HeatingChart.Entries as List<ChartEntry>).Add(newEntry);
-                        MethodInfo dynMethod = HeatingChart.GetType().GetMethod("Invalidate",
-                        BindingFlags.NonPublic | BindingFlags.Instance);
-                        dynMethod.Invoke(HeatingChart, new object[] { });
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HeatingChart)));
-                        await Task.Delay(1000);
+                        IsHeating = true;
+                        await _saunaService.Connect();
+                        await _saunaService.SendAction(SaunaAction.Start);
+                        CurrentStatus = "Heating";
+                        _saunaService.NewInternalData += (e, args) =>
+                        {
+                            var msg = $"New internal data: {args.Temperature}°C, {args.Humidity}%";
+                            Console.WriteLine(msg);
+                            CurrentStatus = msg;
+                        };
+                        _saunaService.NewExternalData += (e, args) =>
+                        {
+                            var msg = $"New external data: {args.Temperature}°C, {args.Humidity}%";
+                            Console.WriteLine(msg);
+                            CurrentStatus = msg;
+                        };
+                        /*foreach (int index in Enumerable.Range(1, 10))
+                        {
+                            var newValue = new Random().Next(100);
+                            var newEntry = new ChartEntry(newValue);// { Label="WTF", ValueLabel = newValue.ToString() };
+                            (HeatingChart.Entries as List<ChartEntry>).Add(newEntry);
+                            MethodInfo dynMethod = HeatingChart.GetType().GetMethod("Invalidate",
+                            BindingFlags.NonPublic | BindingFlags.Instance);
+                            dynMethod.Invoke(HeatingChart, new object[] { });
+                            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HeatingChart)));
+                            await Task.Delay(1000);
+                        }*/
                     }
-                    CurrentStatus = "Done Heating";
-                    IsExecuting = false;
+                    catch (Exception ex) {
+                        Console.WriteLine(ex.Message);
+                        IsHeating = false;
+                    }
                 },
                 canExecute: () =>
                 {
-                    return !IsExecuting;
+                    return !IsHeating;
                 });
+
+            StopCommand = new Command(
+               execute: async () =>
+               {
+                   CurrentStatus = "Stopping Heating";
+                   await _saunaService.Connect();
+                   await _saunaService.SendAction(SaunaAction.Stop);
+                   CurrentStatus = "Stopped Heating";
+                   IsHeating = false;
+               },
+               canExecute: () =>
+               {
+                   return IsHeating;
+               });
         }
     }
 }

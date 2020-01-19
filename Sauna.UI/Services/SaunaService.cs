@@ -15,8 +15,7 @@ namespace Sauna.UI.Services
         public SaunaService()
         {
             _connection = new HubConnectionBuilder()
-                    .WithUrl("http://localhost:53353/ChatHub")
-                    .WithAutomaticReconnect()
+                    .WithUrl("http://localhost:53353/signalr")
                     .Build();
         }
         public async Task<bool> Connect() {
@@ -25,8 +24,8 @@ namespace Sauna.UI.Services
             {
                 var newData = new TemperatureHumidityEventArgs
                 {
-                    Temperature = float.Parse("temperatureCelsius", CultureInfo.InvariantCulture.NumberFormat),
-                    Humidity = float.Parse("humidity", CultureInfo.InvariantCulture.NumberFormat),
+                    Temperature = float.Parse(temperatureCelsius, CultureInfo.InvariantCulture.NumberFormat),
+                    Humidity = float.Parse(humidity, CultureInfo.InvariantCulture.NumberFormat),
                 };
 
                 if (type.ToLower().Equals("internal"))
@@ -41,9 +40,9 @@ namespace Sauna.UI.Services
             return true;
         }
 
-        public async Task SendAction(bool start) {
-            var action = start ? "Start" : "Stop";
-            await _connection.InvokeAsync(action);
+        public async Task SendAction(SaunaAction action) {
+            var method = action == SaunaAction.Start ? "Start" : "Stop";
+            await _connection.InvokeAsync(method);
         }
     }
 }

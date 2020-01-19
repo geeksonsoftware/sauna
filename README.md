@@ -10,8 +10,6 @@ Parameters for new data:
 * temperature: (float string)
 * humidity" (float string)
 
-
-
 # Temperature AM2302 
 
 https://learn.adafruit.com/dht

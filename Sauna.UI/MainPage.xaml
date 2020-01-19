@@ -16,6 +16,10 @@
         <Label Text="{Binding TargetTemperature}" HorizontalOptions="CenterAndExpand" VerticalOptions="Start" />
         <Label Text="{Binding CurrentStatus}" HorizontalOptions="CenterAndExpand" VerticalOptions="Start" />
         <!--<microcharts:ChartView HeightRequest="360" Chart="{Binding HeatingChart}"/>-->
-        <Button Text="Start" Command="{Binding StartCommand}" HorizontalOptions="EndAndExpand"/>
+        <StackLayout Orientation="Horizontal" HorizontalOptions="EndAndExpand">
+            <local:NegateBooleanConverter x:Key="inverter"/>
+            <Button Text="Start" Command="{Binding StartCommand}" IsEnabled="{Binding IsHeating, Converter={StaticResource inverter}}" HorizontalOptions="End"/>
+            <Button Text="Stop" Command="{Binding StopCommand}" IsEnabled="{Binding IsHeating}" HorizontalOptions="End"/>
+        </StackLayout>
     </StackLayout>
 </ContentPage>
