@@ -6,7 +6,6 @@ namespace Sauna.RPI
 {
     public class TemperatureReaderMock : ITemperatureReader
     {
-
         public TemperatureReaderMock()
         {
         }

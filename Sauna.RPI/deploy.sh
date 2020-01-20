@@ -7,7 +7,7 @@
 set -e 
 set -o pipefail
 
-RPI_ADDRESS=192.168.1.115
+RPI_ADDRESS=$1
 DESTINATION=/home/pi/Desktop/sauna_rpi/
 
 echo "Building..."

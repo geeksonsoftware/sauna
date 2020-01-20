@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Sauna.RPI.Controlling;
+using Sauna.RPI.Web;
 using System.Threading.Tasks;
 
 namespace Sauna.RPI
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var sauna = new SaunaController();
+            var sauna = SaunaController.GetInstance();
             sauna.Init();
 
-            Console.ReadLine();
+            var server = new SignalRSelfHost();
+            await server.StartListenAsync();
         }
-
     }
 }
