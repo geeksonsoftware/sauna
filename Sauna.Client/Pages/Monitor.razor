@@ -1,0 +1,24 @@
+@page "/"
+@page "/monitor"
+@inherits MonitorComponent
+@using Microsoft.AspNetCore.Components.Web
+
+<h1>Enjoy your sauna time</h1>
+<form class="form-inline">
+    <div class="input-prepend input-append">
+        <input type="button" id="groupmsg" class="btn" value="Turn on" @onclick=@TurnOn />
+        <input type="button" id="others-groupmsg" class="btn" value="Turn off" @onclick=@TurnOff />
+    </div>
+</form>
+
+<ul>
+    <li>Internal temperature @InternalTemperature C</li>
+    <li>External temperature @ExternalTemperature C</li>
+</ul>
+
+<ul id="message-list">
+    @foreach (var msg in Messages)
+    {
+        <li>@msg</li>
+    }
+</ul>
