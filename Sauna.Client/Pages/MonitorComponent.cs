@@ -20,6 +20,8 @@ namespace Sauna.Client.Pages
         internal double TargetTemperature { get; set; }
         internal double TemperatureStep { get; }
         internal DateTime ETA { get; set; }
+        internal bool IsOn { get; set; }
+        internal bool IsCalculating { get; set; }
 
         double MaxTemperature => 99;
         double MinTemperature => 70;
@@ -49,6 +51,8 @@ namespace Sauna.Client.Pages
                 .Build();
 
             _connection.On<TemperatureReading>("NewTemperatureReading", OnTemperatureReading);
+            _connection.On<bool>("UpdateSaunaStatus", UpdateSaunaStatus);
+            _connection.On<DateTime>("UpdateETA", UpdateETA);
             _connection.OnClose(exc =>
             {
                 Console.WriteLine("Connection was closed! " + exc.ToString());
@@ -56,6 +60,24 @@ namespace Sauna.Client.Pages
                 return Task.CompletedTask;
             });
             await _connection.StartAsync();
+        }
+
+        Task UpdateETA(DateTime eta)
+        {
+            ETA = eta;
+
+            StateHasChanged();
+
+            return Task.CompletedTask;
+        }
+
+        Task UpdateSaunaStatus(bool isOn)
+        {
+            IsOn = isOn;
+
+            StateHasChanged();
+
+            return Task.CompletedTask;
         }
 
         Task OnTemperatureReading(TemperatureReading reading)
@@ -67,14 +89,6 @@ namespace Sauna.Client.Pages
 
             return Task.CompletedTask;
         }
-
-        // async Task<string> GetJwtToken(string userId)
-        //{
-        //    var httpResponse = await this._http.GetAsync($"generatetoken?user={userId}");
-        //    httpResponse.EnsureSuccessStatusCode();
-
-        //    return await httpResponse.Content.ReadAsStringAsync();
-        //}
         
         internal async Task TurnOn()
         {
@@ -88,35 +102,30 @@ namespace Sauna.Client.Pages
 
         internal async Task TemperatureUp()
         {
-            if(TargetTemperature >= MaxTemperature)
+            if (TargetTemperature >= MaxTemperature)
             {
                 return;
             }
 
             TargetTemperature += TemperatureStep;
-            ComputeETA(1);
+
+            IsCalculating = true;
+            await _connection.InvokeAsync("TemperatureUp", TargetTemperature);
+            IsCalculating = false;
         }
+
         internal async Task TemperatureDown()
         {
-            if(TargetTemperature<= MinTemperature)
+            if (TargetTemperature <= MinTemperature)
             {
                 return;
             }
 
             TargetTemperature -= TemperatureStep;
-            ComputeETA(-1);
-        }
 
-        void ComputeETA(int upOrDown)
-        {
-            if (upOrDown > 0)
-            {
-                ETA = ETA.AddMinutes(10);
-            }
-            else
-            {
-                ETA = ETA.AddMinutes(-5);
-            }
+            IsCalculating = true;
+            await _connection.InvokeAsync("TemperatureDown",TargetTemperature);
+            IsCalculating = false;
         }
     }
 }

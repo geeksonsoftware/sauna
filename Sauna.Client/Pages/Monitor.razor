@@ -4,30 +4,33 @@
 @using Microsoft.AspNetCore.Components.Web
 
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-4">
-                <h1 class="display-2 text-center">@TargetTemperature° </h1>
-            </div>
-            <div class="col-1">
-                <div class="btn-group-vertical" role="group">
-                    <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureUp">+</button>
-                    <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureDown">-</button>
-                </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4">
+            <h1 class="display-2 text-center">@TargetTemperature° </h1>
+        </div>
+        <div class="col-2">
+            <div class="btn-group-vertical" role="group">
+                <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureUp">+</button>
+                <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureDown">-</button>
             </div>
         </div>
-        <hr />
-        <div class="row">
-            <div class="col-4">
-                <h1 class="display-1 text-center">@InternalTemperature°</h1>
-            </div>
-            <div class="col-2"></div>
-            <div class="col">
-                <h1 class="display-4">ETA @ETA.ToShortTimeString()</h1>
-            </div>
+        <div class="col">
+            <h1 class="display-4">ETA <span hidden="@(IsCalculating == true)">@ETA.ToString("hh:mm")</span><img src="img/loading.svg" width="60" height="60" hidden="@(IsCalculating != true)" /></h1>
         </div>
-
     </div>
+    <hr />
+    <div class="row">
+        <div class="col-4">
+            <h1 class="display-1 text-center">@InternalTemperature°</h1>
+        </div>
+        <div class="col-2"></div>
+        <div class="col">
+            <img src="img/heating.svg" hidden="@(IsOn != true)" />
+        </div>
+    </div>
+
+</div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm">

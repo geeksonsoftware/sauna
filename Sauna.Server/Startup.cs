@@ -45,7 +45,7 @@ namespace Sauna.Server
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SaunaController sauna, SaunaMessenger saunaTicker)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SaunaController sauna, SaunaMessenger saunaMessenger)
         {
             app.UseResponseCompression();
 
@@ -72,7 +72,7 @@ namespace Sauna.Server
             });
 
             sauna.Init();
-            saunaTicker.WireSauna(sauna);
+            saunaMessenger.WireSauna(sauna);
         }
     }
 }

@@ -4,6 +4,7 @@ using Sauna.Core;
 using Sauna.RPI.Controlling;
 using System;
 using Sauna.Server.Extensions;
+using System.Threading.Tasks;
 
 namespace Sauna.Server.Hubs
 {
@@ -30,6 +31,26 @@ namespace Sauna.Server.Hubs
             var reading = new TemperatureReading() { Time = timestamp, Internal = internalTemperature.ToSaunaTemperature(), External = externalTemperature.ToSaunaTemperature() };
 
             _hubContext.Clients.All.SendAsync("NewTemperatureReading", reading);
+        }
+
+        internal async Task TurnOn()
+        {
+            await _sauna.TurnOn();
+
+            await _hubContext.Clients.All.SendAsync("UpdateSaunaStatus", true);
+        }
+
+        internal async Task TurnOff()
+        {
+            await _sauna.TurnOff();
+
+            await _hubContext.Clients.All.SendAsync("UpdateSaunaStatus", false);
+        }
+
+        internal async Task UpdateTargetTemperature(double targetTemperature)
+        {
+            await _sauna.UpdateTargetTemperature(targetTemperature);
+            await _hubContext.Clients.All.SendAsync("UpdateETA", DateTime.Now.AddMinutes(targetTemperature));
         }
     }
 }

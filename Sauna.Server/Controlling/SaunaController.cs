@@ -1,12 +1,15 @@
 using Iot.Units;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sauna.RPI.Controlling
 {
     public class SaunaController
     {
         ITemperatureReader _temperatureReader;
+
+        double _targetTemperature;
 
         Timer _updateTemperatureTimer;
         readonly TimeSpan _updateTemperatureInterval;
@@ -28,8 +31,6 @@ namespace Sauna.RPI.Controlling
         internal void Init()
         {
             _updateTemperatureTimer = new Timer(UpdateTemperature, null, _updateTemperatureInterval, _updateTemperatureInterval);
-
-           // Console.WriteLine("Start monitoring the sauna");
         }
 
         void UpdateTemperature(object state)
@@ -48,6 +49,23 @@ namespace Sauna.RPI.Controlling
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+        internal Task TurnOn()
+        {
+            return Task.CompletedTask;
+        }
+
+        internal Task TurnOff()
+        {
+            return Task.CompletedTask;
+        }
+
+        internal async Task UpdateTargetTemperature(double targetTemperature)
+        {
+            _targetTemperature = targetTemperature;
+
+            //fake it takes a while to compute the new ETA
+            await Task.Delay(TimeSpan.FromSeconds(3));
         }
     }
 }
