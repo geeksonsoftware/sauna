@@ -15,12 +15,12 @@ namespace Sauna.RPI
 
         public Temperature? ReadInternalTemperature()
         {
-            return Temperature.FromCelsius(_random.Next() % 100);
+            return Temperature.FromCelsius(DateTime.Now.Millisecond % 50 + 50 );
         }
 
         public Temperature? ReadExternalTemperature()
         {
-            return Temperature.FromCelsius(_random.Next() % 30);
+            return Temperature.FromCelsius(DateTime.Now.Millisecond % 2 + 20);
         }
     }
 }

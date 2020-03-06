@@ -3,22 +3,38 @@
 @inherits MonitorComponent
 @using Microsoft.AspNetCore.Components.Web
 
-<h1>Enjoy your sauna time</h1>
-<form class="form-inline">
-    <div class="input-prepend input-append">
-        <input type="button" id="groupmsg" class="btn" value="Turn on" @onclick=@TurnOn />
-        <input type="button" id="others-groupmsg" class="btn" value="Turn off" @onclick=@TurnOff />
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-4">
+                <h1 class="display-2 text-center">@TargetTemperature° </h1>
+            </div>
+            <div class="col-1">
+                <div class="btn-group-vertical" role="group">
+                    <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureUp">+</button>
+                    <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureDown">-</button>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-4">
+                <h1 class="display-1 text-center">@InternalTemperature°</h1>
+            </div>
+            <div class="col-2"></div>
+            <div class="col">
+                <h1 class="display-4">ETA @ETA.ToShortTimeString()</h1>
+            </div>
+        </div>
+
     </div>
-</form>
-
-<ul>
-    <li>Internal temperature @InternalTemperature C</li>
-    <li>External temperature @ExternalTemperature C</li>
-</ul>
-
-<ul id="message-list">
-    @foreach (var msg in Messages)
-    {
-        <li>@msg</li>
-    }
-</ul>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm">
+            <button type="button" class="btn btn-lg btn-success btn-block" @onclick=@TurnOn>ON</button>
+        </div>
+        <div class="col-sm">
+            <button type="button" class="btn btn-lg btn-danger btn-block" @onclick=@TurnOff>OFF</button>
+        </div>
+    </div>
+</div>

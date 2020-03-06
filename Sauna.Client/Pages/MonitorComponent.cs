@@ -15,14 +15,25 @@ namespace Sauna.Client.Pages
 
         #region UI Bindings
 
-        internal List<string> Messages { get; set; } = new List<string>();
-
         internal double InternalTemperature { get; set; }
         internal double ExternalTemperature { get; set; }
+        internal double TargetTemperature { get; set; }
+        internal double TemperatureStep { get; }
+        internal DateTime ETA { get; set; }
+
+        double MaxTemperature => 99;
+        double MinTemperature => 70;
 
         #endregion
 
         HubConnection _connection;
+
+        public MonitorComponent()
+        {
+            TargetTemperature = 80;
+            TemperatureStep = 1;
+            ETA = DateTime.Now.AddHours(2);
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -37,7 +48,6 @@ namespace Sauna.Client.Pages
                 //.AddMessagePackProtocol()
                 .Build();
 
-            _connection.On<string>("Send", Handle);
             _connection.On<TemperatureReading>("NewTemperatureReading", OnTemperatureReading);
             _connection.OnClose(exc =>
             {
@@ -65,18 +75,7 @@ namespace Sauna.Client.Pages
 
         //    return await httpResponse.Content.ReadAsStringAsync();
         //}
-
-        Task Handle(string msg)
-        {
-            Console.WriteLine(msg);
-
-            Messages.Add(msg.ToString());
-
-            StateHasChanged();
-
-            return Task.CompletedTask;
-        }
-
+        
         internal async Task TurnOn()
         {
             await _connection.InvokeAsync("TurnOn");
@@ -85,6 +84,39 @@ namespace Sauna.Client.Pages
         internal async Task TurnOff()
         {
             await _connection.InvokeAsync("TurnOff");
+        }
+
+        internal async Task TemperatureUp()
+        {
+            if(TargetTemperature >= MaxTemperature)
+            {
+                return;
+            }
+
+            TargetTemperature += TemperatureStep;
+            ComputeETA(1);
+        }
+        internal async Task TemperatureDown()
+        {
+            if(TargetTemperature<= MinTemperature)
+            {
+                return;
+            }
+
+            TargetTemperature -= TemperatureStep;
+            ComputeETA(-1);
+        }
+
+        void ComputeETA(int upOrDown)
+        {
+            if (upOrDown > 0)
+            {
+                ETA = ETA.AddMinutes(10);
+            }
+            else
+            {
+                ETA = ETA.AddMinutes(-5);
+            }
         }
     }
 }

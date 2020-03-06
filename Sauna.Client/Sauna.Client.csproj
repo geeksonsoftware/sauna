@@ -8,6 +8,7 @@
     </RestoreAdditionalProjectSources>
     <LangVersion>7.3</LangVersion>
     <RazorLangVersion>3.0</RazorLangVersion>
+    <Configurations>Debug;Release;RPI</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Blazor.Extensions.SignalR" Version="1.0.0" />
