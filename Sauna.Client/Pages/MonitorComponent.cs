@@ -1,10 +1,11 @@
 using Blazor.Extensions;
 using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Sauna.Core;
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sauna.Client.Pages
 {
@@ -20,8 +21,10 @@ namespace Sauna.Client.Pages
         internal double TargetTemperature { get; set; }
         internal double TemperatureStep { get; }
         internal DateTime ETA { get; set; }
+        internal string ETATime { get; set; }
         internal bool IsOn { get; set; }
         internal bool IsCalculating { get; set; }
+        internal DateTime Now { get; set; }
 
         double MaxTemperature => 99;
         double MinTemperature => 70;
@@ -34,7 +37,7 @@ namespace Sauna.Client.Pages
         {
             TargetTemperature = 80;
             TemperatureStep = 1;
-            ETA = DateTime.Now.AddHours(2);
+            Now = DateTime.Now;
         }
 
         protected override async Task OnInitializedAsync()
@@ -47,7 +50,7 @@ namespace Sauna.Client.Pages
                     opt.Transport = HttpTransportType.WebSockets;
                     opt.SkipNegotiation = true;
                 })
-                //.AddMessagePackProtocol()
+                .AddMessagePackProtocol()
                 .Build();
 
             _connection.On<TemperatureReading>("NewTemperatureReading", OnTemperatureReading);
@@ -60,6 +63,25 @@ namespace Sauna.Client.Pages
                 return Task.CompletedTask;
             });
             await _connection.StartAsync();
+
+            //new Timer(UpdateTime, null, Timeout.Infinite, 1000);
+        }
+
+        void UpdateTime(object state)
+        {
+            Now = DateTime.Now;
+
+            if (IsOn && ETA != null)
+            {
+                var x = ETA - Now;
+                ETATime = ToPrettyFormat(x);
+            }
+            else
+            {
+                ETATime = null;
+            }
+
+            StateHasChanged();
         }
 
         Task UpdateETA(DateTime eta)
@@ -89,7 +111,7 @@ namespace Sauna.Client.Pages
 
             return Task.CompletedTask;
         }
-        
+
         internal async Task TurnOn()
         {
             await _connection.InvokeAsync("TurnOn");
@@ -124,8 +146,34 @@ namespace Sauna.Client.Pages
             TargetTemperature -= TemperatureStep;
 
             IsCalculating = true;
-            await _connection.InvokeAsync("TemperatureDown",TargetTemperature);
+            await _connection.InvokeAsync("TemperatureDown", TargetTemperature);
             IsCalculating = false;
+        }
+
+        internal string ToPrettyFormat(TimeSpan span)
+        {
+            if (span == TimeSpan.Zero)
+            {
+                return "0 minutes";
+            }
+
+            var sb = new StringBuilder();
+            if (span.Days > 0)
+            {
+                _ = sb.AppendFormat("{0} day{1} ", span.Days, span.Days > 1 ? "s" : string.Empty);
+            }
+
+            if (span.Hours > 0)
+            {
+                _ = sb.AppendFormat("{0} hour{1} ", span.Hours, span.Hours > 1 ? "s" : string.Empty);
+            }
+
+            if (span.Minutes > 0)
+            {
+                _ = sb.AppendFormat("{0} minute{1} ", span.Minutes, span.Minutes > 1 ? "s" : string.Empty);
+            }
+
+            return sb.ToString();
         }
     }
 }
