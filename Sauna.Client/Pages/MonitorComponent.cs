@@ -1,4 +1,3 @@
-using Blazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Sauna.Core;
 using System;
@@ -6,13 +5,14 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace Sauna.Client.Pages
 {
     public class MonitorComponent : ComponentBase
     {
-        [Inject] private HttpClient _http { get; set; }
-        [Inject] private HubConnectionBuilder _hubConnectionBuilder { get; set; }
+        [Inject] private NavigationManager NavigationManager { get; set; }
 
         #region UI Bindings
 
@@ -42,29 +42,37 @@ namespace Sauna.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            _connection = _hubConnectionBuilder
-                .WithUrl("/saunaHub",
-                opt =>
-                {
-                    opt.LogLevel = SignalRLogLevel.None;
-                    opt.Transport = HttpTransportType.WebSockets;
-                    opt.SkipNegotiation = true;
-                })
-                .AddMessagePackProtocol()
-                .Build();
+            _connection = new HubConnectionBuilder()
+             .WithUrl(NavigationManager.ToAbsoluteUri("/saunaHub"))
+             .Build();
+
+            //_connection = _hubConnectionBuilder
+            //    .WithUrl("/saunaHub",
+            //    opt =>
+            //    {
+            //        // opt.LogLevel = SignalRLogLevel.None;
+            //        // opt.Transport = HttpTransportType.WebSockets;
+            //        //opt.SkipNegotiation = true;
+            //        //opt.Transports = HttpTransportType.WebSockets;
+            //    })
+            //    //.AddMessagePackProtocol()
+            //    .Build();
 
             _connection.On<TemperatureReading>("NewTemperatureReading", OnTemperatureReading);
             _connection.On<bool>("UpdateSaunaStatus", UpdateSaunaStatus);
             _connection.On<DateTime>("UpdateETA", UpdateETA);
-            _connection.OnClose(exc =>
-            {
-                Console.WriteLine("Connection was closed! " + exc.ToString());
+            _connection.Closed += OnConnectionClosed;
 
-                return Task.CompletedTask;
-            });
             await _connection.StartAsync();
 
-            //new Timer(UpdateTime, null, Timeout.Infinite, 1000);
+            new Timer(UpdateTime, null, Timeout.Infinite, 1000);
+        }
+
+        Task OnConnectionClosed(Exception arg)
+        {
+            Console.WriteLine("Connection was closed! " + arg?.ToString());
+
+            return Task.CompletedTask;
         }
 
         void UpdateTime(object state)
