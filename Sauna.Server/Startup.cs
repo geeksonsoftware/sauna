@@ -18,7 +18,10 @@ namespace Sauna.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddSignalR(options => options.KeepAliveInterval = TimeSpan.FromSeconds(5))
+                .AddSignalR(options =>
+                {
+                    options.KeepAliveInterval = TimeSpan.FromSeconds(5);
+                })
                 //.AddMessagePackProtocol();
                 .AddJsonProtocol();
 
@@ -30,12 +33,6 @@ namespace Sauna.Server
 
             services.AddMvc();
 
-            services.AddResponseCompression(opts =>
-            {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
-            });
-
             services.AddSingleton<SaunaMessenger>();
             services.AddSingleton<SaunaController>();
         }
@@ -43,8 +40,6 @@ namespace Sauna.Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SaunaController sauna, SaunaMessenger saunaMessenger)
         {
-            app.UseResponseCompression();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

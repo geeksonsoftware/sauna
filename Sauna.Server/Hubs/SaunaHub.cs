@@ -1,16 +1,9 @@
 using Microsoft.AspNetCore.SignalR;
-using System;
 using System.Threading.Tasks;
 
 namespace Sauna.Server.Hubs
 {
-    public interface ISaunaHub
-    {
-        Task UpdateSaunaStatus(bool isOn);
-
-        Task UpdateETA(DateTime eta);
-    }
-    public class SaunaHub : Hub<ISaunaHub>
+    public class SaunaHub : Hub
     {
         readonly SaunaMessenger _messenger;
 
@@ -18,10 +11,6 @@ namespace Sauna.Server.Hubs
         {
             this._messenger = messenger;
         }
-        //public override async Task OnDisconnectedAsync(Exception ex)
-        //{
-        //    await this.Clients.Others.SendAsync("Send", $"{this.Context.ConnectionId} left");
-        //}
         
         public Task TurnOn()
         {
@@ -34,15 +23,19 @@ namespace Sauna.Server.Hubs
             //notify the UI that the heater has been turned off
             return _messenger.TurnOff();
         }
+        public Task EstimateETA(double targetTemperature)
+        {
+            return _messenger.UpdateTargetTemperature(targetTemperature);
+        }
 
         public Task TemperatureUp(double targetTemperature)
         {
-           return _messenger.UpdateTargetTemperature(targetTemperature);
+            return EstimateETA(targetTemperature);
         }
 
         public Task TemperatureDown(double targetTemperature)
         {
-            return _messenger.UpdateTargetTemperature(targetTemperature);
+            return EstimateETA(targetTemperature);
         }
     }
 }

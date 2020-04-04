@@ -20,8 +20,7 @@ namespace Sauna.Client.Pages
         internal double ExternalTemperature { get; set; }
         internal double TargetTemperature { get; set; }
         internal double TemperatureStep { get; }
-        internal DateTime ETA { get; set; }
-        internal string ETATime { get; set; }
+        internal string ETA { get; set; }
         internal bool IsOn { get; set; }
         internal bool IsCalculating { get; set; }
         internal DateTime Now { get; set; }
@@ -37,35 +36,29 @@ namespace Sauna.Client.Pages
         {
             TargetTemperature = 80;
             TemperatureStep = 1;
+
             Now = DateTime.Now;
         }
 
         protected override async Task OnInitializedAsync()
         {
-            _connection = new HubConnectionBuilder()
-             .WithUrl(NavigationManager.ToAbsoluteUri("/saunaHub"))
-             .Build();
+            Console.WriteLine("Initialized");
 
-            //_connection = _hubConnectionBuilder
-            //    .WithUrl("/saunaHub",
-            //    opt =>
-            //    {
-            //        // opt.LogLevel = SignalRLogLevel.None;
-            //        // opt.Transport = HttpTransportType.WebSockets;
-            //        //opt.SkipNegotiation = true;
-            //        //opt.Transports = HttpTransportType.WebSockets;
-            //    })
-            //    //.AddMessagePackProtocol()
-            //    .Build();
+            _connection = new HubConnectionBuilder()
+             .WithUrl(NavigationManager.ToAbsoluteUri("/saunaHub"), opt =>
+             {
+                 opt.Transports = HttpTransportType.WebSockets;
+             })
+             .Build();
 
             _connection.On<TemperatureReading>("NewTemperatureReading", OnTemperatureReading);
             _connection.On<bool>("UpdateSaunaStatus", UpdateSaunaStatus);
-            _connection.On<DateTime>("UpdateETA", UpdateETA);
+            _connection.On<TimeSpan>("UpdateETA", UpdateETA);
             _connection.Closed += OnConnectionClosed;
 
             await _connection.StartAsync();
 
-            new Timer(UpdateTime, null, Timeout.Infinite, 1000);
+            new Timer(Clock, null, 0, 1000);
         }
 
         Task OnConnectionClosed(Exception arg)
@@ -75,26 +68,18 @@ namespace Sauna.Client.Pages
             return Task.CompletedTask;
         }
 
-        void UpdateTime(object state)
+        void Clock(object status)
         {
             Now = DateTime.Now;
-
-            if (IsOn && ETA != null)
-            {
-                var x = ETA - Now;
-                ETATime = ToPrettyFormat(x);
-            }
-            else
-            {
-                ETATime = null;
-            }
 
             StateHasChanged();
         }
 
-        Task UpdateETA(DateTime eta)
+        Task UpdateETA(TimeSpan remaining)
         {
-            ETA = eta;
+            ETA = ToPrettyFormat(remaining);
+
+            IsCalculating = false;
 
             StateHasChanged();
 
@@ -104,6 +89,11 @@ namespace Sauna.Client.Pages
         Task UpdateSaunaStatus(bool isOn)
         {
             IsOn = isOn;
+
+            if (isOn)
+            {
+                _connection.InvokeAsync("EstimateETA", TargetTemperature);
+            }
 
             StateHasChanged();
 

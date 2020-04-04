@@ -50,7 +50,11 @@ namespace Sauna.Server.Hubs
         internal async Task UpdateTargetTemperature(double targetTemperature)
         {
             await _sauna.UpdateTargetTemperature(targetTemperature);
-            await _hubContext.Clients.All.SendAsync("UpdateETA", DateTime.Now.AddMinutes(targetTemperature));
+
+            var eta = DateTime.Now.AddMinutes(targetTemperature);
+            var remaining = (eta - DateTime.Now);
+
+            await _hubContext.Clients.All.SendAsync("UpdateETA", remaining);
         }
     }
 }

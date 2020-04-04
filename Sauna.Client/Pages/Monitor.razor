@@ -23,8 +23,7 @@
 
             </div>
             <div class="col-4">
-                <h3><img src="img/clock.svg" width="30" height="30" /> @Now.ToString("hh:mm")</h3>
-                <h3><img src="img/calculating.svg" width="30" height="30" /> <span hidden="@(IsCalculating == true)">@ETA.ToString("hh:mm")</span><img src="img/loading.svg" width="30" height="30" hidden="@(IsCalculating != true)" /></h3>
+                <h3><img src="img/clock.svg" width="30" height="30" /> @Now.ToShortTimeString()</h3>
             </div>
         </div>
         <hr/>
@@ -42,7 +41,7 @@
 
             </div>
             <div class="col-4">
-                <h3><img src="img/calculating.svg" width="30" height="30" /> <span hidden="@(IsCalculating == true)">@ETATime</span><img src="img/loading.svg" width="30" height="30" hidden="@(IsCalculating != true)" /></h3>
+                <h3><img src="img/calculating.svg" width="30" height="30" /> <span hidden="@(IsCalculating == true)">@ETA</span><img src="img/loading.svg" width="30" height="30" hidden="@(IsCalculating != true)" /></h3>
             </div>
         </div>
     </div>
