@@ -1,0 +1,47 @@
+@page "/"
+@page "/monitor"
+@inherits MonitorComponent
+@using Microsoft.AspNetCore.Components.Web
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2">
+                <img src="img/on.svg" hidden="@(IsOn == true)" @onclick=@TurnOn />
+                <img src="img/off.svg" hidden="@(IsOn != true)" @onclick=@TurnOff />
+            </div>
+            <div class="col-3">
+                <h5 class="display-2 text-center">@TargetTemperature° </h5>
+            </div>
+            <div class="col-1">
+                <div class="btn-group-vertical" role="group">
+                    <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureUp">+</button>
+                    <button type="button" class="btn btn-lg btn-secondary" @onclick="TemperatureDown">-</button>
+                </div>
+            </div>
+            <div class="col-2">
+
+            </div>
+            <div class="col-4">
+                <h3><img src="img/clock.svg" width="30" height="30" /> @Now.ToShortTimeString()</h3>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-2">
+                <img src="img/heating.svg" hidden="@(IsOn != true)" />
+            </div>
+            <div class="col-3">
+                <h1 class="display-1 text-center">@InternalTemperature°</h1>
+            </div>
+            <div class="col-1">
+
+            </div>
+            <div class="col-2">
+
+            </div>
+            <div class="col-4">
+                <h3><img src="img/calculating.svg" width="30" height="30" /> <span hidden="@(IsCalculating == true)">@ETA</span><img src="img/loading.svg" width="30" height="30" hidden="@(IsCalculating != true)" /></h3>
+            </div>
+        </div>
+    </div>
