@@ -25,15 +25,12 @@ Task("Clean")
 Task("Restore")
     .Does(() =>
 {
-    DotNetCoreRestore();
+    DotNetCoreRestore("./Sauna.sln");
 });
 
 Task("Build")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Restore")
     .Does(() =>
 {
-
     DotNetCoreBuild("./Sauna.sln", new DotNetCoreBuildSettings
     {        
         Configuration = configuration,
@@ -42,8 +39,6 @@ Task("Build")
 });
 
 Task("Publish")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Restore")
     .Does(() =>
 {
     DotNetCorePublish("./Sauna.Server", new DotNetCorePublishSettings
