@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RestoreAdditionalProjectSources>
       https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
       https://dotnet.myget.org/F/blazor-dev/api/v3/index.json;
@@ -11,22 +10,18 @@
     <OutputType>Exe</OutputType>
     <StartupObject />
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RPI|AnyCPU'">
     <DefineConstants>TRACE;RPI</DefineConstants>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Iot.Device.Bindings" Version="1.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.0" />
-    <PackageReference Include="System.Device.Gpio" Version="1.0.0" />
+    <PackageReference Include="Iot.Device.Bindings" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.1" />
+    <PackageReference Include="System.Device.Gpio" Version="1.2.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Sauna.Client\Sauna.Client.csproj" />
     <ProjectReference Include="..\Sauna.Core\Sauna.Core.csproj" />
   </ItemGroup>
-
 </Project>

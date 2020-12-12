@@ -1,5 +1,5 @@
-﻿using Iot.Device.DHTxx;
-using Iot.Units;
+using Iot.Device.DHTxx;
+using UnitsNet;
 using System;
 
 namespace Sauna.RPI
