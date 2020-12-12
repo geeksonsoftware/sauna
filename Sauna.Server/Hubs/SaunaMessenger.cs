@@ -1,4 +1,4 @@
-using Iot.Units;
+using UnitsNet;
 using Microsoft.AspNetCore.SignalR;
 using Sauna.Core;
 using Sauna.RPI.Controlling;
@@ -26,7 +26,7 @@ namespace Sauna.Server.Hubs
             _sauna.TemperatureRead += _sauna_TemperatureRead;
         }
 
-        void _sauna_TemperatureRead(DateTime timestamp, Iot.Units.Temperature internalTemperature, Iot.Units.Temperature externalTemperature)
+        void _sauna_TemperatureRead(DateTime timestamp, UnitsNet.Temperature internalTemperature, UnitsNet.Temperature externalTemperature)
         {
             var reading = new TemperatureReading() { Time = timestamp, Internal = internalTemperature.ToSaunaTemperature(), External = externalTemperature.ToSaunaTemperature() };
 

@@ -1,5 +1,5 @@
 using Iot.Device.DHTxx;
-using Iot.Units;
+using UnitsNet;
 using System;
 
 namespace Sauna.RPI
@@ -15,12 +15,12 @@ namespace Sauna.RPI
 
         public Temperature? ReadInternalTemperature()
         {
-            return Temperature.FromCelsius(DateTime.Now.Millisecond % 50 + 50 );
+            return Temperature.FromDegreesCelsius(DateTime.Now.Millisecond % 50 + 50 );
         }
 
         public Temperature? ReadExternalTemperature()
         {
-            return Temperature.FromCelsius(DateTime.Now.Millisecond % 2 + 20);
+            return Temperature.FromDegreesCelsius(DateTime.Now.Millisecond % 2 + 20);
         }
     }
 }
